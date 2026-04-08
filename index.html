@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dialog FX Processor – Rade Films</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ──────────────────────────────────────────────────────────── */
+:root {
+  --bg:        #1a1a1a;
+  --bg-mid:    #202020;
+  --panel:     #252525;
+  --panel-2:   #2e2e2e;
+  --ink:       #ffffff;
+  --muted:     #888888;
+  --line:      rgba(255,255,255,0.07);
+  --accent:    #c9a84c;
+  --accent-dk: #a8883a;
+  --font:      'Montserrat', system-ui, sans-serif;
+
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+
+  --sp-1: 8px;
+  --sp-2: 16px;
+  --sp-3: 24px;
+  --sp-4: 32px;
+  --sp-5: 40px;
+  --sp-6: 48px;
+}
+
+/* ── RESET ───────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── BASE ────────────────────────────────────────────────────────────── */
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-weight: 400;
+  min-height: 100vh;
+  padding: var(--sp-6) var(--sp-3) 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  width: 100%;
+  max-width: 860px;
+}
+
+/* ── HEADER ──────────────────────────────────────────────────────────── */
+header {
+  margin-bottom: var(--sp-5);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: var(--sp-4);
+}
+.header-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--sp-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+header h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--ink);
+  margin-bottom: var(--sp-1);
+  letter-spacing: -0.02em;
+}
+header h1 span { color: var(--accent); }
+header p {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.65;
+  max-width: 520px;
+  font-weight: 400;
+}
+
+/* ── DROP ZONE ───────────────────────────────────────────────────────── */
+.dropzone {
+  border: 1.5px dashed rgba(201,168,76,0.3);
+  border-radius: var(--r-lg);
+  padding: 44px var(--sp-3);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: var(--sp-4);
+  background: rgba(201,168,76,0.03);
+  user-select: none;
+}
+.dropzone:hover, .dropzone.drag-over {
+  border-color: var(--accent);
+  background: rgba(201,168,76,0.07);
+}
+.dropzone .dz-icon {
+  font-size: 1.8rem;
+  margin-bottom: var(--sp-2);
+  opacity: 0.6;
+  display: block;
+}
+.dropzone h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.dropzone p { font-size: 0.78rem; color: var(--muted); }
+.dropzone.has-file {
+  border-style: solid;
+  border-color: var(--accent);
+  background: rgba(201,168,76,0.06);
+}
+.dropzone.has-file .dz-icon { opacity: 1; }
+
+/* ── SECTION LABEL ───────────────────────────────────────────────────── */
+.section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--sp-2);
+  padding-left: 2px;
+}
+
+/* ── PRESETS ─────────────────────────────────────────────────────────── */
+.presets-section { margin-bottom: var(--sp-3); }
+.presets-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.preset-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px 14px 12px;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+  min-height: 84px;
+  position: relative;
+  overflow: hidden;
+}
+.preset-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.preset-card:hover { border-color: rgba(201,168,76,0.3); }
+.preset-card:hover::after { transform: scaleX(1); }
+.preset-card.active {
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 8px 24px rgba(201,168,76,0.2);
+}
+.preset-card.active::after { display: none; }
+.preset-card.active .preset-desc { color: rgba(26,26,26,0.65); }
+.preset-card.active .preset-name { color: #1a1a1a; }
+.preset-icon {
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  display: block;
+  opacity: 0.7;
+}
+.preset-card.active .preset-icon { opacity: 1; }
+.preset-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 3px;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+.preset-desc {
+  font-size: 0.65rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ── EFFECT CARDS ────────────────────────────────────────────────────── */
+.effects-section { margin-bottom: var(--sp-3); }
+.effect-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--sp-3);
+  margin-bottom: 8px;
+}
+.effect-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+.effect-badge {
+  width: 26px; height: 26px;
+  border-radius: var(--r-sm);
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+  letter-spacing: 0;
+}
+.effect-info h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 2px;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+.effect-info p {
+  font-size: 0.73rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.controls-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--sp-2) var(--sp-3);
+}
+.control-group { display: flex; flex-direction: column; gap: 8px; }
+.control-label {
+  font-size: 0.68rem;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-1);
+  font-weight: 500;
+}
+.control-label .val {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  background: rgba(201,168,76,0.1);
+  padding: 1px 8px;
+  border-radius: 99px;
+  border: 1px solid rgba(201,168,76,0.2);
+}
+
+/* ── SLIDERS ─────────────────────────────────────────────────────────── */
+input[type="range"] {
+  width: 100%; height: 3px;
+  -webkit-appearance: none; appearance: none;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  outline: none; cursor: pointer;
+  border: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 2px solid var(--panel);
+  box-shadow: 0 0 0 1px var(--accent);
+  transition: transform 0.12s;
+}
+input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.2); }
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--panel);
+  cursor: pointer;
+}
+
+.limiter-note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ── EXPORT PANEL ────────────────────────────────────────────────────── */
+.export-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+.fmt-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-top: var(--sp-2);
+}
+.fmt-card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 10px 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fmt-card:hover { border-color: rgba(201,168,76,0.3); background: rgba(201,168,76,0.05); }
+.fmt-card.active { background: var(--accent); border-color: transparent; }
+.fmt-card.active .fmt-name,
+.fmt-card.active .fmt-sub,
+.fmt-card.active .fmt-use { color: #1a1a1a; }
+.fmt-name { font-size: 0.78rem; font-weight: 800; color: var(--ink); letter-spacing: 0.02em; }
+.fmt-sub  { font-size: 0.63rem; font-weight: 600; color: var(--muted); }
+.fmt-use  { font-size: 0.6rem;  color: var(--muted); line-height: 1.3; margin-top: 1px; }
+
+.quality-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.quality-label {
+  font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); white-space: nowrap;
+}
+.q-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+.q-btn {
+  font-family: var(--font);
+  font-size: 0.72rem; font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: transparent; color: var(--muted);
+  cursor: pointer; transition: all 0.15s;
+}
+.q-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--accent); }
+.q-btn.active { background: var(--accent); border-color: transparent; color: #1a1a1a; }
+
+/* ── BUTTONS AREA ────────────────────────────────────────────────────── */
+.btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: var(--sp-2);
+}
+
+.preview-btn {
+  width: 100%;
+  padding: 15px var(--sp-4);
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-md);
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, opacity 0.2s;
+}
+.preview-btn:hover { background: rgba(201,168,76,0.1); }
+.preview-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.process-btn {
+  width: 100%;
+  padding: 15px var(--sp-4);
+  background: var(--accent);
+  color: #1a1a1a;
+  border: none;
+  border-radius: var(--r-md);
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s, box-shadow 0.2s;
+  box-shadow: 0 6px 24px rgba(201,168,76,0.25);
+}
+.process-btn:hover { background: var(--accent-dk); box-shadow: 0 10px 32px rgba(201,168,76,0.35); }
+.process-btn:active { transform: scale(0.985); }
+.process-btn:disabled { opacity: 0.28; cursor: not-allowed; box-shadow: none; }
+
+/* ── PREVIEW PLAYER ──────────────────────────────────────────────────── */
+#previewPlayer {
+  background: var(--panel);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: var(--r-md);
+  padding: var(--sp-2) var(--sp-3);
+  margin-bottom: var(--sp-2);
+  display: none;
+  align-items: center;
+  gap: var(--sp-2);
+}
+#previewPlayer .player-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+#previewPlayer audio {
+  flex: 1;
+  height: 32px;
+  accent-color: var(--accent);
+}
+/* Chromium audio player dark override */
+#previewPlayer audio::-webkit-media-controls-panel { background: var(--panel-2); }
+
+/* ── STATUS + PROGRESS ───────────────────────────────────────────────── */
+.status {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: var(--sp-1);
+  min-height: 20px;
+  letter-spacing: 0.02em;
+}
+.status.ok   { color: #5cb87a; }
+.status.err  { color: #e06060; }
+.status.proc { color: var(--accent); }
+
+.progress-bar {
+  height: 2px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 1px;
+  margin-bottom: var(--sp-2);
+  overflow: hidden;
+  display: none;
+}
+.progress-bar.show { display: block; }
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.25s;
+  border-radius: 1px;
+}
+
+/* ── DIVIDER ─────────────────────────────────────────────────────────── */
+.divider { height: 1px; background: var(--line); margin: var(--sp-3) 0; }
+
+/* ── FOOTER ──────────────────────────────────────────────────────────── */
+footer {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.7;
+  margin-top: var(--sp-1);
+}
+footer strong { color: var(--ink); font-weight: 600; }
+.footer-brand {
+  margin-top: 8px;
+  font-size: 0.65rem;
+  opacity: 0.4;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  body { padding: var(--sp-4) var(--sp-2) 60px; }
+  .presets-grid { grid-template-columns: repeat(3, 1fr); }
+  .controls-row { grid-template-columns: 1fr 1fr; }
+  .fmt-grid { grid-template-columns: repeat(3, 1fr); }
+  .btn-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 420px) {
+  .presets-grid { grid-template-columns: repeat(2, 1fr); }
+  .controls-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-eyebrow">Audio Post-Production Tool</div>
+    <h1>Dialog FX <span>Processor</span></h1>
+    <p>Nahraj zvukový soubor, vyber preset, dolaď efekty — přehraj si náhled přímo v prohlížeči a stáhni teprve až budeš spokojený.</p>
+  </header>
+
+  <div class="dropzone" id="dropzone">
+    <span class="dz-icon">🎙</span>
+    <h3>Přetáhni audio nebo video soubor sem</h3>
+    <p>WAV, MP3, MP4, AAC, FLAC, OGG, M4A a další</p>
+    <input type="file" id="fileInput" accept=".wav,.mp3,.mp4,.m4a,.aac,.ogg,.flac,.webm,.mov" style="display:none">
+  </div>
+
+  <section class="presets-section">
+    <div class="section-label">Rychlé presety</div>
+    <div class="presets-grid" id="presetsGrid"></div>
+  </section>
+
+  <section class="effects-section">
+    <div class="section-label">Doladění efektů</div>
+
+    <!-- 1 HPF -->
+    <div class="effect-card">
+      <div class="effect-header">
+        <div class="effect-badge">01</div>
+        <div class="effect-info">
+          <h3>High-Pass Filter</h3>
+          <p>Odstraní brum a basy pod zadanou frekvencí</p>
+        </div>
+      </div>
+      <div class="controls-row" style="grid-template-columns: 1fr;">
+        <div class="control-group">
+          <div class="control-label">Cutoff frekvence <span class="val" id="hpfVal">80 Hz</span></div>
+          <input type="range" id="hpf" min="20" max="500" value="80" step="1">
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 Kompresor -->
+    <div class="effect-card">
+      <div class="effect-header">
+        <div class="effect-badge">02</div>
+        <div class="effect-info">
+          <h3>Kompresor</h3>
+          <p>Srovná dynamiku – hlas bude konstantně slyšitelný</p>
+        </div>
+      </div>
+      <div class="controls-row">
+        <div class="control-group">
+          <div class="control-label">Threshold <span class="val" id="compThreshVal">−20 dB</span></div>
+          <input type="range" id="compThresh" min="-60" max="0" value="-20" step="1">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Ratio <span class="val" id="compRatioVal">3.5 : 1</span></div>
+          <input type="range" id="compRatio" min="1" max="20" value="3.5" step="0.5">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Výstupní zesílení <span class="val" id="compGainVal">0 dB</span></div>
+          <input type="range" id="compGain" min="-12" max="12" value="0" step="0.5">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 EQ -->
+    <div class="effect-card">
+      <div class="effect-header">
+        <div class="effect-badge">03</div>
+        <div class="effect-info">
+          <h3>Parametrický EQ</h3>
+          <p>Tvarování frekvenčního spektra hlasu</p>
+        </div>
+      </div>
+      <div class="controls-row">
+        <div class="control-group">
+          <div class="control-label">Basy @ 120 Hz <span class="val" id="eqBassVal">0 dB</span></div>
+          <input type="range" id="eqBass" min="-12" max="12" value="0" step="0.5">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Brum @ 400 Hz <span class="val" id="eqMudVal">0 dB</span></div>
+          <input type="range" id="eqMud" min="-12" max="6" value="0" step="0.5">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Presence @ 3 kHz <span class="val" id="eqPresVal">+2.5 dB</span></div>
+          <input type="range" id="eqPres" min="-6" max="10" value="2.5" step="0.5">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Vzduch @ 9 kHz <span class="val" id="eqAirVal">+2 dB</span></div>
+          <input type="range" id="eqAir" min="-6" max="10" value="2" step="0.5">
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Limiter -->
+    <div class="effect-card">
+      <div class="effect-header" style="margin-bottom:0">
+        <div class="effect-badge">04</div>
+        <div class="effect-info">
+          <h3>Limiter</h3>
+          <p class="limiter-note">Automatický — ceiling −1 dBFS. Žádné nastavení není potřeba.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 Reverb -->
+    <div class="effect-card">
+      <div class="effect-header">
+        <div class="effect-badge">05</div>
+        <div class="effect-info">
+          <h3>Reverb</h3>
+          <p>Zasadí hlas do prostoru – pre-delay zajistí přítomnost bez mlhy</p>
+        </div>
+      </div>
+      <div class="controls-row">
+        <div class="control-group">
+          <div class="control-label">Wet mix <span class="val" id="revWetVal">0 %</span></div>
+          <input type="range" id="revWet" min="0" max="60" value="0" step="1">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Decay <span class="val" id="revDecayVal">0.6 s</span></div>
+          <input type="range" id="revDecay" min="0.1" max="5" value="0.6" step="0.1">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Pre-delay <span class="val" id="revPredelayVal">10 ms</span></div>
+          <input type="range" id="revPredelay" min="0" max="100" value="10" step="1">
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Export panel -->
+  <div class="export-panel">
+    <div class="section-label">Výstupní formát</div>
+    <div class="fmt-grid" id="fmtGrid">
+      <div class="fmt-card active" data-fmt="wav16">
+        <span class="fmt-name">WAV</span>
+        <span class="fmt-sub">16-bit</span>
+        <span class="fmt-use">Střih &amp; post</span>
+      </div>
+      <div class="fmt-card" data-fmt="wav24">
+        <span class="fmt-name">WAV</span>
+        <span class="fmt-sub">24-bit</span>
+        <span class="fmt-use">Studio kvalita</span>
+      </div>
+      <div class="fmt-card" data-fmt="aiff">
+        <span class="fmt-name">AIFF</span>
+        <span class="fmt-sub">24-bit</span>
+        <span class="fmt-use">Pro Tools, Logic</span>
+      </div>
+      <div class="fmt-card" data-fmt="mp3">
+        <span class="fmt-name">MP3</span>
+        <span class="fmt-sub">komprimovaný</span>
+        <span class="fmt-use">Web &amp; sdílení</span>
+      </div>
+      <div class="fmt-card" data-fmt="ogg">
+        <span class="fmt-name">OGG</span>
+        <span class="fmt-sub">komprimovaný</span>
+        <span class="fmt-use">Web, open formát</span>
+      </div>
+      <div class="fmt-card" data-fmt="aac">
+        <span class="fmt-name">AAC</span>
+        <span class="fmt-sub">komprimovaný</span>
+        <span class="fmt-use">Mobil &amp; Apple</span>
+      </div>
+    </div>
+    <div class="quality-strip" id="qualityStrip" style="display:none">
+      <span class="quality-label" id="qualityLabel">Bitrate</span>
+      <div class="q-btns" id="qBtns"></div>
+    </div>
+  </div>
+
+  <div class="status" id="status"></div>
+  <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <!-- Preview player (zobrazí se po zpracování náhledu) -->
+  <div id="previewPlayer">
+    <span class="player-label">Náhled</span>
+    <audio id="previewAudio" controls></audio>
+  </div>
+
+  <div class="btn-row">
+    <button class="preview-btn" id="previewBtn">▶ Přehrát náhled</button>
+    <button class="process-btn" id="processBtn">⬇ Stáhnout</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <footer>
+    <p>Stažený soubor přetáhni přímo na timeline nebo do svého <strong>editačního softwaru</strong>.</p>
+    <p class="footer-brand">© Rade Films</p>
+  </footer>
+
+</div><!-- /container -->
+
+<script>
+// ── PRESETS ───────────────────────────────────────────────────────────
+const PRESETS = [
+  { name:'Čistý dialog',    icon:'✦',  desc:'Přirozený hlas bez ozvěny – film / rozhovor',
+    s:{ hpf:80,  ct:-20, cr:3.5, cg:0,  eb:0,   em:0,   ep:2.5, ea:2,  rw:0,  rd:0.6, rp:10 } },
+  { name:'Dokumentární',    icon:'◈',  desc:'Vřelý, důvěryhodný, malý prostor',
+    s:{ hpf:100, ct:-18, cr:3,   cg:1,  eb:1.5, em:-1,  ep:1.5, ea:1,  rw:8,  rd:0.4, rp:5  } },
+  { name:'Trailer Voice',   icon:'◉',  desc:'Epický velký reverb, silná komprese',
+    s:{ hpf:100, ct:-30, cr:8,   cg:4,  eb:3,   em:-2,  ep:4,   ea:3,  rw:35, rd:2.5, rp:20 } },
+  { name:'Hluboký hlas',    icon:'◎',  desc:'Posílené basy, tmavý tón, malý prostor',
+    s:{ hpf:60,  ct:-22, cr:4,   cg:2,  eb:4,   em:1,   ep:-1,  ea:-1, rw:5,  rd:0.5, rp:8  } },
+  { name:'Podcast',         icon:'◷',  desc:'Vzdušný, přirozený hlas pro mluvené slovo',
+    s:{ hpf:90,  ct:-22, cr:3,   cg:2,  eb:-1,  em:-2,  ep:3,   ea:3,  rw:3,  rd:0.3, rp:5  } },
+  { name:'Vintage / Retro', icon:'◑',  desc:'Teplý charakter, lehce filtrovaný, lo-fi nádech',
+    s:{ hpf:180, ct:-20, cr:5,   cg:2,  eb:3,   em:2,   ep:-2,  ea:-3, rw:12, rd:0.8, rp:0  } },
+  { name:'Atmosférický',    icon:'◒',  desc:'Snový prostor, velký reverb, éterický nádech',
+    s:{ hpf:70,  ct:-18, cr:2.5, cg:1,  eb:0,   em:-1,  ep:2,   ea:4,  rw:50, rd:3.5, rp:25 } },
+  { name:'Jemný / Šepot',   icon:'◌',  desc:'Intimní, tichý, atmosferický dozvuk',
+    s:{ hpf:60,  ct:-15, cr:2.5, cg:1,  eb:1,   em:0,   ep:1,   ea:2,  rw:20, rd:1.2, rp:15 } },
+  { name:'Radio / Promo',   icon:'◐',  desc:'Jasný, přítomný, bez reverbu',
+    s:{ hpf:120, ct:-25, cr:6,   cg:3,  eb:-2,  em:-3,  ep:5,   ea:4,  rw:0,  rd:0.3, rp:0  } },
+  // ── NOVÉ PRESETY ────────────────────────────────────────────────────
+  { name:'Vysílačka',       icon:'📡', desc:'Dva piloti v kokpitu – úzké pásmo, šum, militantní charakter',
+    s:{ hpf:320, ct:-30, cr:12,  cg:6,  eb:-10, em:5,   ep:10,  ea:-12, rw:0,  rd:0.2, rp:0 } },
+  { name:'Megafon',         icon:'📢', desc:'Ulice – megafon z dálky a shora, venkovní prostor, vzduch pohlcuje výšky',
+    s:{ hpf:420, ct:-24, cr:8,   cg:2,  eb:-10, em:3,   ep:-4,  ea:-12, rw:22, rd:0.5, rp:70 } },
+  { name:'Rádio',           icon:'📻', desc:'AM bandpass 300 Hz–3 kHz, teplý střed, žádné basy ani vzduch',
+    s:{ hpf:280, ct:-28, cr:8,   cg:4,  eb:-8,  em:5,   ep:4,   ea:-12, rw:0,  rd:0.4, rp:0 } },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let audioBuffer = null;
+let fileName = 'processed_dialog';
+let activePresetIndex = 0;
+let exportFmt = 'wav16';
+let mp3Quality = 192;
+
+const S = { hpf:80, ct:-20, cr:3.5, cg:0, eb:0, em:0, ep:2.5, ea:2, rw:0, rd:0.6, rp:10 };
+
+// ── SLIDER MAP ────────────────────────────────────────────────────────
+const fHz  = v => Math.round(v) + ' Hz';
+const fdB  = v => (v>=0?'+':'')+parseFloat(v).toFixed(1)+' dB';
+const fR   = v => parseFloat(v).toFixed(1)+' : 1';
+const fPct = v => Math.round(v)+' %';
+const fSec = v => parseFloat(v).toFixed(1)+' s';
+const fMs  = v => Math.round(v)+' ms';
+
+const SLIDERS = [
+  ['hpf',        'hpfVal',        'hpf', fHz ],
+  ['compThresh', 'compThreshVal', 'ct',  fdB ],
+  ['compRatio',  'compRatioVal',  'cr',  fR  ],
+  ['compGain',   'compGainVal',   'cg',  fdB ],
+  ['eqBass',     'eqBassVal',     'eb',  fdB ],
+  ['eqMud',      'eqMudVal',      'em',  fdB ],
+  ['eqPres',     'eqPresVal',     'ep',  fdB ],
+  ['eqAir',      'eqAirVal',      'ea',  fdB ],
+  ['revWet',     'revWetVal',     'rw',  fPct],
+  ['revDecay',   'revDecayVal',   'rd',  fSec],
+  ['revPredelay','revPredelayVal','rp',  fMs ],
+];
+
+SLIDERS.forEach(([sid, vid, key, fmt]) => {
+  const el = document.getElementById(sid);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    S[key] = parseFloat(el.value);
+    document.getElementById(vid).textContent = fmt(el.value);
+  });
+});
+
+function syncSliders() {
+  SLIDERS.forEach(([sid, vid, key, fmt]) => {
+    const el = document.getElementById(sid);
+    if (!el) return;
+    el.value = S[key];
+    document.getElementById(vid).textContent = fmt(S[key]);
+  });
+}
+
+// ── BUILD PRESETS ─────────────────────────────────────────────────────
+function buildPresets() {
+  const grid = document.getElementById('presetsGrid');
+  PRESETS.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'preset-card' + (i === 0 ? ' active' : '');
+    card.innerHTML = `<span class="preset-icon">${p.icon}</span>
+      <div class="preset-name">${p.name}</div>
+      <div class="preset-desc">${p.desc}</div>`;
+    card.addEventListener('click', () => {
+      activePresetIndex = i;
+      Object.assign(S, p.s);
+      syncSliders();
+      document.querySelectorAll('.preset-card').forEach((c,j) => c.classList.toggle('active', j===i));
+    });
+    grid.appendChild(card);
+  });
+}
+
+// ── DROP ZONE ─────────────────────────────────────────────────────────
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+async function loadFile(file) {
+  setStatus('Načítám soubor…', 'proc');
+  fileName = file.name.replace(/\.[^.]+$/, '');
+  try {
+    const ab = await file.arrayBuffer();
+    const ctx = new AudioContext();
+    audioBuffer = await ctx.decodeAudioData(ab);
+    await ctx.close();
+    dropzone.classList.add('has-file');
+    dropzone.innerHTML = `
+      <span class="dz-icon">✓</span>
+      <h3>${file.name}</h3>
+      <p>${(file.size/1024/1024).toFixed(2)} MB · ${audioBuffer.numberOfChannels}ch · ${audioBuffer.sampleRate} Hz · ${audioBuffer.duration.toFixed(1)} s</p>
+      <input type="file" id="fileInput" accept=".wav,.mp3,.aac,.ogg,.flac" style="display:none">`;
+    document.getElementById('fileInput').addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
+    // Skryj přehrávač při načtení nového souboru
+    document.getElementById('previewPlayer').style.display = 'none';
+    setStatus('Soubor načten — připraven ke zpracování.', 'ok');
+  } catch(e) {
+    setStatus('Chyba načítání: ' + e.message, 'err');
+  }
+}
+
+// ── REVERB IR ─────────────────────────────────────────────────────────
+function makeIR(ctx, duration, decay) {
+  const len = Math.ceil(ctx.sampleRate * duration);
+  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = buf.getChannelData(ch);
+    for (let i = 0; i < len; i++)
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+  }
+  return buf;
+}
+
+// ── RENDER AUDIO (shared logic) ────────────────────────────────────────
+async function renderAudio(onProgress) {
+  const numCh = Math.min(audioBuffer.numberOfChannels, 2);
+  const sr = audioBuffer.sampleRate;
+  const extra = Math.ceil(sr * (S.rd + 0.5));
+  const offCtx = new OfflineAudioContext(numCh, audioBuffer.length + extra, sr);
+
+  const src = offCtx.createBufferSource();
+  src.buffer = audioBuffer;
+
+  const hpf = offCtx.createBiquadFilter();
+  hpf.type = 'highpass'; hpf.frequency.value = S.hpf; hpf.Q.value = 0.707;
+
+  const comp = offCtx.createDynamicsCompressor();
+  comp.threshold.value = S.ct; comp.ratio.value = S.cr;
+  comp.knee.value = 5; comp.attack.value = 0.005; comp.release.value = 0.15;
+
+  const compGain = offCtx.createGain();
+  compGain.gain.value = Math.pow(10, S.cg / 20);
+
+  const eqBass = offCtx.createBiquadFilter();
+  eqBass.type = 'peaking'; eqBass.frequency.value = 120; eqBass.Q.value = 0.7; eqBass.gain.value = S.eb;
+
+  const eqMud = offCtx.createBiquadFilter();
+  eqMud.type = 'peaking'; eqMud.frequency.value = 400; eqMud.Q.value = 1.2; eqMud.gain.value = S.em;
+
+  const eqPres = offCtx.createBiquadFilter();
+  eqPres.type = 'peaking'; eqPres.frequency.value = 3000; eqPres.Q.value = 0.9; eqPres.gain.value = S.ep;
+
+  const eqAir = offCtx.createBiquadFilter();
+  eqAir.type = 'highshelf'; eqAir.frequency.value = 9000; eqAir.gain.value = S.ea;
+
+  const lim = offCtx.createDynamicsCompressor();
+  lim.threshold.value = -1; lim.ratio.value = 20;
+  lim.knee.value = 0; lim.attack.value = 0.001; lim.release.value = 0.05;
+
+  src.connect(hpf); hpf.connect(comp); comp.connect(compGain);
+  compGain.connect(eqBass); eqBass.connect(eqMud); eqMud.connect(eqPres); eqPres.connect(eqAir);
+
+  if (S.rw > 0) {
+    const dryG = offCtx.createGain(); dryG.gain.value = 1;
+    const wetG = offCtx.createGain(); wetG.gain.value = S.rw / 100;
+    const preD = offCtx.createDelay(0.5); preD.delayTime.value = Math.min(S.rp / 1000, 0.499);
+    const conv = offCtx.createConvolver(); conv.buffer = makeIR(offCtx, S.rd, 3);
+    eqAir.connect(dryG); eqAir.connect(preD);
+    preD.connect(conv); conv.connect(wetG);
+    dryG.connect(lim); wetG.connect(lim);
+  } else {
+    eqAir.connect(lim);
+  }
+  lim.connect(offCtx.destination);
+
+  if (onProgress) onProgress(25);
+  src.start(0);
+  const rendered = await offCtx.startRendering();
+  if (onProgress) onProgress(75);
+  return rendered;
+}
+
+// ── PREVIEW ────────────────────────────────────────────────────────────
+async function previewAudio() {
+  if (!audioBuffer) { setStatus('Nejdříve nahraj zvukový soubor.', 'err'); return; }
+  const btn = document.getElementById('previewBtn');
+  const dlBtn = document.getElementById('processBtn');
+  btn.disabled = true; dlBtn.disabled = true;
+  setStatus('Zpracovávám náhled…', 'proc');
+  showProgress(true); setProgress(5);
+
+  try {
+    const rendered = await renderAudio(setProgress);
+    setProgress(85);
+
+    // Vždy jako WAV pro náhled (rychle, bez konverze)
+    const blob = new Blob([encodeWAV(rendered, 16)], { type: 'audio/wav' });
+    const url = URL.createObjectURL(blob);
+
+    const player = document.getElementById('previewPlayer');
+    const audio  = document.getElementById('previewAudio');
+
+    // Uvolni předchozí URL
+    if (audio.src) URL.revokeObjectURL(audio.src);
+    audio.src = url;
+    player.style.display = 'flex';
+    audio.play();
+
+    setProgress(100);
+    setStatus('Náhled připraven — poslouchej!', 'ok');
+    setTimeout(() => showProgress(false), 1000);
+  } catch(e) {
+    setStatus('Chyba náhledu: ' + e.message, 'err');
+    showProgress(false);
+  }
+  btn.disabled = false; dlBtn.disabled = false;
+}
+
+// ── PROCESS + DOWNLOAD ─────────────────────────────────────────────────
+async function processAudio() {
+  if (!audioBuffer) { setStatus('Nejdříve nahraj zvukový soubor.', 'err'); return; }
+  const btn = document.getElementById('processBtn');
+  const pvBtn = document.getElementById('previewBtn');
+  btn.disabled = true; pvBtn.disabled = true;
+  setStatus('Zpracovávám…', 'proc');
+  showProgress(true); setProgress(5);
+
+  try {
+    const rendered = await renderAudio(setProgress);
+    setProgress(80);
+
+    const presetSlug = PRESETS[activePresetIndex].name
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+    let blob, ext;
+    const q = parseInt(exportQuality);
+
+    if (exportFmt === 'mp3') {
+      blob = new Blob([encodeMp3(rendered, q)], { type: 'audio/mpeg' }); ext = 'mp3';
+      setProgress(95);
+    } else if (exportFmt === 'aiff') {
+      blob = new Blob([encodeAIFF(rendered)], { type: 'audio/aiff' }); ext = 'aiff';
+      setProgress(95);
+    } else if (exportFmt === 'ogg' || exportFmt === 'aac') {
+      setStatus('Kóduji přes MediaRecorder…', 'proc');
+      blob = await encodeViaMediaRecorder(rendered, exportFmt, q);
+      ext = exportFmt === 'aac' ? 'm4a' : 'ogg';
+      setProgress(95);
+    } else {
+      blob = new Blob([encodeWAV(rendered, exportFmt === 'wav24' ? 24 : 16)], { type: 'audio/wav' }); ext = 'wav';
+      setProgress(95);
+    }
+
+    const url = URL.createObjectURL(blob);
+    const finalName = fileName + '_' + presetSlug + '.' + ext;
+    const a = document.createElement('a'); a.href = url; a.download = finalName; a.click();
+    URL.revokeObjectURL(url);
+
+    setProgress(100);
+    setStatus('Hotovo — soubor byl stažen.', 'ok');
+    setTimeout(() => showProgress(false), 1200);
+  } catch(e) {
+    setStatus('Chyba zpracování: ' + e.message, 'err');
+    showProgress(false);
+  }
+  btn.disabled = false; pvBtn.disabled = false;
+}
+
+// ── WAV ENCODER (16 or 24-bit) ────────────────────────────────────────
+function encodeWAV(buf, bits = 16) {
+  const nc = buf.numberOfChannels, sr = buf.sampleRate, len = buf.length;
+  const bps = bits / 8;
+  const dataSize = len * nc * bps;
+  const ab = new ArrayBuffer(44 + dataSize);
+  const v = new DataView(ab);
+  const ws = (o, s) => { for (let i=0;i<s.length;i++) v.setUint8(o+i, s.charCodeAt(i)); };
+  ws(0,'RIFF'); v.setUint32(4,36+dataSize,true); ws(8,'WAVE');
+  ws(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true);
+  v.setUint16(22,nc,true); v.setUint32(24,sr,true);
+  v.setUint32(28,sr*nc*bps,true); v.setUint16(32,nc*bps,true); v.setUint16(34,bits,true);
+  ws(36,'data'); v.setUint32(40,dataSize,true);
+  const chs = Array.from({length:nc},(_,c)=>buf.getChannelData(c));
+  let off = 44;
+  if (bits === 16) {
+    for (let i=0;i<len;i++) for (let c=0;c<nc;c++) {
+      const s = Math.max(-1,Math.min(1,chs[c][i]));
+      v.setInt16(off, s<0?s*0x8000:s*0x7FFF, true); off+=2;
+    }
+  } else {
+    for (let i=0;i<len;i++) for (let c=0;c<nc;c++) {
+      const s = Math.max(-1,Math.min(1,chs[c][i]));
+      const val = s<0 ? s*0x800000 : s*0x7FFFFF;
+      v.setUint8(off,   val & 0xFF);
+      v.setUint8(off+1, (val>>8) & 0xFF);
+      v.setUint8(off+2, (val>>16) & 0xFF);
+      off+=3;
+    }
+  }
+  return ab;
+}
+
+// ── AIFF ENCODER (24-bit big-endian) ─────────────────────────────────
+function encodeAIFF(buf) {
+  const nc = buf.numberOfChannels, sr = buf.sampleRate, len = buf.length;
+  const dataSize = len * nc * 3;
+  const ssndSize = dataSize + 8;
+  const ab = new ArrayBuffer(54 + dataSize);
+  const v = new DataView(ab);
+  const ws = (o, s) => { for (let i=0;i<s.length;i++) v.setUint8(o+i, s.charCodeAt(i)); };
+  ws(0,'FORM'); v.setUint32(4, 46 + dataSize, false); ws(8,'AIFF');
+  ws(12,'COMM'); v.setUint32(16, 26, false);
+  v.setInt16(20, nc, false);
+  v.setUint32(22, len, false);
+  v.setInt16(26, 24, false);
+  const srExt = floatToExtended(sr);
+  srExt.forEach((b, i) => v.setUint8(28 + i, b));
+  ws(38,'SSND'); v.setUint32(42, ssndSize, false);
+  v.setUint32(46, 0, false); v.setUint32(50, 0, false);
+  const chs = Array.from({length:nc},(_,c)=>buf.getChannelData(c));
+  let off = 54;
+  for (let i=0;i<len;i++) for (let c=0;c<nc;c++) {
+    const s = Math.max(-1, Math.min(1, chs[c][i]));
+    const val = Math.round(s < 0 ? s * 0x800000 : s * 0x7FFFFF);
+    v.setUint8(off,   (val >> 16) & 0xFF);
+    v.setUint8(off+1, (val >> 8) & 0xFF);
+    v.setUint8(off+2,  val & 0xFF);
+    off += 3;
+  }
+  return ab;
+}
+function floatToExtended(val) {
+  const bytes = new Uint8Array(10);
+  if (val === 0) return bytes;
+  let exp = Math.floor(Math.log2(val)) + 16383;
+  let mant = val / Math.pow(2, exp - 16383 - 63);
+  bytes[0] = (exp >> 8) & 0x7F;
+  bytes[1] = exp & 0xFF;
+  for (let i = 7; i >= 2; i--) {
+    bytes[i] = mant & 0xFF;
+    mant = Math.floor(mant / 256);
+  }
+  return bytes;
+}
+
+// ── OGG / AAC via MediaRecorder ───────────────────────────────────────
+async function encodeViaMediaRecorder(buf, fmt, kbps) {
+  const mimeMap = {
+    ogg: ['audio/ogg; codecs=opus', 'audio/ogg'],
+    aac: ['audio/mp4; codecs=mp4a.40.2', 'audio/aac', 'audio/mp4'],
+  };
+  const mimes = mimeMap[fmt] || [];
+  const mime = mimes.find(m => MediaRecorder.isTypeSupported(m));
+  if (!mime) throw new Error(`Formát ${fmt.toUpperCase()} není v tomto prohlížeči podporován. Zkus WAV nebo MP3.`);
+
+  const ctx = new AudioContext({ sampleRate: buf.sampleRate });
+  const dest = ctx.createMediaStreamDestination();
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  src.connect(dest);
+
+  const rec = new MediaRecorder(dest.stream, { mimeType: mime, audioBitsPerSecond: kbps * 1000 });
+  const chunks = [];
+  rec.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+
+  return new Promise((resolve, reject) => {
+    rec.onstop = () => { ctx.close(); resolve(new Blob(chunks, { type: mime })); };
+    rec.onerror = e => { ctx.close(); reject(e.error); };
+    rec.start(100);
+    src.start(0);
+    src.onended = () => rec.stop();
+    setTimeout(() => { if (rec.state !== 'inactive') rec.stop(); }, (buf.duration + 2) * 1000);
+  });
+}
+
+// ── MP3 ENCODER (via lamejs) ──────────────────────────────────────────
+function encodeMp3(buf, kbps) {
+  if (typeof lamejs === 'undefined') {
+    throw new Error('MP3 encoder (lamejs) se nepodařilo načíst. Zkus WAV formát nebo zkontroluj připojení.');
+  }
+  const nc = Math.min(buf.numberOfChannels, 2);
+  const sr = buf.sampleRate;
+  const mp3enc = new lamejs.Mp3Encoder(nc, sr, kbps);
+  const blockSize = 1152;
+  const left  = pcm16Array(buf.getChannelData(0));
+  const right = nc > 1 ? pcm16Array(buf.getChannelData(1)) : left;
+  const chunks = [];
+  for (let i = 0; i < left.length; i += blockSize) {
+    const l = left.subarray(i, i + blockSize);
+    const r = right.subarray(i, i + blockSize);
+    const d = nc > 1 ? mp3enc.encodeBuffer(l, r) : mp3enc.encodeBuffer(l);
+    if (d.length > 0) chunks.push(new Int8Array(d));
+  }
+  const end = mp3enc.flush();
+  if (end.length > 0) chunks.push(new Int8Array(end));
+  const total = chunks.reduce((a, c) => a + c.length, 0);
+  const out = new Int8Array(total);
+  let off = 0;
+  chunks.forEach(c => { out.set(c, off); off += c.length; });
+  return out.buffer;
+}
+function pcm16Array(floats) {
+  const out = new Int16Array(floats.length);
+  for (let i = 0; i < floats.length; i++) {
+    const s = Math.max(-1, Math.min(1, floats[i]));
+    out[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+  }
+  return out;
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────────────
+function setStatus(msg, cls) {
+  const el = document.getElementById('status');
+  el.textContent = msg; el.className = 'status ' + (cls||'');
+}
+function showProgress(v) {
+  document.getElementById('progressBar').classList.toggle('show', v);
+  if (!v) setProgress(0);
+}
+function setProgress(pct) { document.getElementById('progressFill').style.width = pct+'%'; }
+
+document.getElementById('previewBtn').addEventListener('click', previewAudio);
+document.getElementById('processBtn').addEventListener('click', processAudio);
+
+// ── FORMAT SELECTOR ───────────────────────────────────────────────────
+const FMT_QUALITY = {
+  mp3: { label: 'Bitrate',  opts: [{v:'128',l:'128 kbps'},{v:'192',l:'192 kbps',def:true},{v:'320',l:'320 kbps'}] },
+  ogg: { label: 'Bitrate',  opts: [{v:'96',l:'96 kbps'},{v:'160',l:'160 kbps',def:true},{v:'256',l:'256 kbps'}] },
+  aac: { label: 'Bitrate',  opts: [{v:'96',l:'96 kbps'},{v:'192',l:'192 kbps',def:true},{v:'256',l:'256 kbps'}] },
+};
+let exportQuality = '192';
+
+document.getElementById('fmtGrid').addEventListener('click', e => {
+  const card = e.target.closest('.fmt-card');
+  if (!card) return;
+  exportFmt = card.dataset.fmt;
+  document.querySelectorAll('#fmtGrid .fmt-card').forEach(c => c.classList.toggle('active', c === card));
+
+  const strip = document.getElementById('qualityStrip');
+  const qdef = FMT_QUALITY[exportFmt];
+  if (qdef) {
+    document.getElementById('qualityLabel').textContent = qdef.label;
+    const qBtns = document.getElementById('qBtns');
+    qBtns.innerHTML = '';
+    qdef.opts.forEach(o => {
+      const b = document.createElement('button');
+      b.className = 'q-btn' + (o.def ? ' active' : '');
+      b.textContent = o.l; b.dataset.q = o.v;
+      if (o.def) exportQuality = o.v;
+      b.addEventListener('click', () => {
+        exportQuality = o.v;
+        qBtns.querySelectorAll('.q-btn').forEach(x => x.classList.toggle('active', x === b));
+      });
+      qBtns.appendChild(b);
+    });
+    strip.style.display = 'flex';
+  } else {
+    strip.style.display = 'none';
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────
+buildPresets();
+syncSliders();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+</body>
+</html>
